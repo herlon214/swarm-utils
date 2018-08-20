@@ -17,7 +17,7 @@ const buildNodeTasksTable = (nodes) => {
   nodes.forEach(node => {
     nodesTasksTable[0].push(`${node.Description.Hostname} - (${node.Spec.Role})`)
     if (node.Tasks.length > 0) {
-      nodesTasksTable[1].push(node.Tasks.join('\n'))
+      nodesTasksTable[1].push(node.Tasks.join('\r\n'))
     } else {
       nodesTasksTable[1].push('None')
     }
