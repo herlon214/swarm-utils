@@ -12,13 +12,14 @@ async function main () {
   // Get nodes
   let nodes = await docker.listNodes()
 
-  // Get tasks in each node
-  const tasks = await docker.listTasks()
+  // Get running tasks
+  let tasks = await docker.listTasks()
+  tasks = tasks.filter(task => task.Status.State === 'running')
 
   // Parse tasks into each node
   nodes = await map(async node => {
     // List running node's tasks 
-    node['Tasks'] = tasks.filter(task => task.NodeID === node.ID && task.Status.State === 'running')
+    node['Tasks'] = tasks.filter(task => task.NodeID === node.ID)
   
     return node
   }, nodes)
