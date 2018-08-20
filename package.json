@@ -1,0 +1,23 @@
+{
+  "name": "swarm-utils",
+  "version": "1.0.0",
+  "description": "Provide some utilities for Docker Swarm",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "docker",
+    "swarm",
+    "swarm",
+    "nodejs"
+  ],
+  "author": "Herlon Aguiar",
+  "license": "ISC",
+  "dependencies": {
+    "awaity": "^1.0.0",
+    "debug": "^3.1.0",
+    "dockerode": "^2.5.5"
+  }
+}
