@@ -8,7 +8,7 @@
     "url": "https://github.com/herlon214/swarm-utils"
   },
   "scripts": {
-    "start": "node src/index.js",
+    "start": "DEBUG=swarm-utils:* node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
