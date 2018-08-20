@@ -8,7 +8,7 @@
     "url": "https://github.com/herlon214/swarm-utils"
   },
   "scripts": {
-    "start": "DEBUG=swarm-utils:* node src/index.js",
+    "start": "DEBUG=swarm-utils node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -22,6 +22,7 @@
   "dependencies": {
     "awaity": "^1.0.0",
     "debug": "^3.1.0",
-    "dockerode": "^2.5.5"
+    "dockerode": "^2.5.5",
+    "table": "^4.0.3"
   }
 }
