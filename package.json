@@ -21,8 +21,8 @@
   "license": "ISC",
   "dependencies": {
     "awaity": "^1.0.0",
+    "cli-table": "^0.3.1",
     "debug": "^3.1.0",
-    "dockerode": "^2.5.5",
-    "table": "^4.0.3"
+    "dockerode": "^2.5.5"
   }
 }

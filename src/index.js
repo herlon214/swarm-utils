@@ -1,37 +1,61 @@
 // Libs
 const Docker = require('dockerode')
 const { map } = require('awaity/fp')
-const { table } = require('table')
+const Table = require('cli-table')
 const debug = require('debug')('swarm-utils')
 
 // Initializtion
 const docker = new Docker({ socketPath: '/var/run/docker.sock' })
 let summaryTable = [
-  ['Nodes', 'Tasks', 'Tasks/Node', 'Nodes exceeding tasks limit'],
+  ,
   ['-', '-', '-', '-']
 ]
 
+const buildSummaryTable = (info) => {
+  const table = new Table({
+    head: ['Nodes', 'Tasks', 'Tasks/Node', 'Nodes exceeding tasks limit']
+  })
+
+  table.push([info.nodes, info.tasks, info.tasksAvg, info.tasksExceeding])
+
+  return table
+}
+
 // Return an array with nodes tasks
 const buildNodeTasksTable = (nodes) => {
-  nodesTasksTable = [[], []]
+  const table = new Table({
+    head: [nodes.map(node => `${node.Description.Hostname.substring(0, 20)} - (${node.Spec.Role})`)]
+  })
+
+  // Insert data
+  const data = []
   nodes.forEach(node => {
-    nodesTasksTable[0].push(`${node.Description.Hostname} - (${node.Spec.Role})`)
     if (node.Tasks.length > 0) {
-      nodesTasksTable[1].push(node.Tasks.join('\r\n'))
+      data.push(node.Tasks.map(task => task.Service.Spec.Name).join(' '))
     } else {
-      nodesTasksTable[1].push('None')
+      data.push('None')
     }
   })
-  return nodesTasksTable
+
+  table.push(data)
+
+  return table
 }
 
 async function main () {
   // Get nodes
   let nodes = await docker.listNodes()
 
+  // Get services
+  const services = await docker.listServices()
+
   // Get running tasks
   let tasks = await docker.listTasks()
   tasks = tasks.filter(task => task.Status.State === 'running')
+  tasks = await map(async task => {
+    task['Service'] = services.filter(service => service.ID === task.ServiceID)[0]
+    return task
+  }, tasks)
 
   // Insert tasks into his node
   nodes = await map(async node => {
@@ -54,11 +78,16 @@ async function main () {
   summaryTable[1][3] = nodesExceeding.length
 
   debug(`Summary:`)
-  console.log(table(summaryTable))
+  console.log(buildSummaryTable({
+    nodes: nodes.length,
+    tasks: tasks.length,
+    tasksAvg,
+    tasksExceeding: nodesExceeding.length
+  }).toString())
 
   // Show the node's tasks table
   debug(`Nodes with tasks:`)
-  console.log(table(buildNodeTasksTable(nodes)))
+  console.log(buildNodeTasksTable(nodes).toString())
 
   // Show exceeding tasks information
   nodesExceeding.forEach(node => {
