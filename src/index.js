@@ -31,7 +31,7 @@ const buildNodeTasksTable = (nodes) => {
   const data = []
   nodes.forEach(node => {
     if (node.Tasks.length > 0) {
-      data.push(node.Tasks.map(task => task.Service.Spec.Name).join(' '))
+      data.push(node.Tasks.map(task => task.Service.Spec.Name).join('\r\n'))
     } else {
       data.push('None')
     }
