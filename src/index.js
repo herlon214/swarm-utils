@@ -24,14 +24,14 @@ const buildSummaryTable = (info) => {
 // Return an array with nodes tasks
 const buildNodeTasksTable = (nodes) => {
   const table = new Table({
-    head: [nodes.map(node => `${node.Description.Hostname.substring(0, 20)} - (${node.Spec.Role})`)]
+    head: nodes.map(node => `${node.Description.Hostname.substring(0, 20)} - (${node.Spec.Role})`)
   })
 
   // Insert data
   const data = []
   nodes.forEach(node => {
     if (node.Tasks.length > 0) {
-      data.push(node.Tasks.map(task => task.Service.Spec.Name).join('\r\n'))
+      data.push(node.Tasks.map(task => task.Service.Spec.Name).join('\n'))
     } else {
       data.push('None')
     }
