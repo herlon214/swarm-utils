@@ -42,6 +42,35 @@ const buildNodeTasksTable = (nodes) => {
   return table
 }
 
+// Check anti-affinity in each node
+const checkAntiAffinity = (nodes) => {
+  nodes.forEach(node => {
+    // Count the tasks with same service id
+    const servicesCounter = node.Tasks.reduce((acc, item) => {
+      if (!acc[item.Service.ID]) {
+        acc[item.Service.ID] = 1
+      } else {
+        acc[item.Service.ID] += 1
+      }
+
+      return acc
+    }, {})
+
+
+    // Check for affinity
+    Object.keys(servicesCounter).forEach(serviceId => {
+      if (servicesCounter[serviceId] > 1) {
+        debug(`Node ${data.node.Description.Hostname} has more than one service ${serviceId}`)
+
+        const tasks = node.Tasks.filter(task => task.Service.ID === serviceId)
+
+        debug(`Must kill one of: ${tasks.join(', ')}`)
+      }
+    })
+  })
+
+}
+
 async function main () {
   // Get nodes
   let nodes = await docker.listNodes()
@@ -94,6 +123,9 @@ async function main () {
     const tasksNumber = node['Tasks'].length
     debug(`Node ${node.Description.Hostname} have ${tasksNumber} tasks, ${tasksNumber - tasksAvg} more than the limit.`)
   })
+
+  // Check for anti-affinity
+  checkAntiAffinity(nodes)
 }
 
 main()
