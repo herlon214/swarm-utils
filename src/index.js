@@ -60,7 +60,7 @@ const checkAntiAffinity = (nodes) => {
     // Check for affinity
     Object.keys(servicesCounter).forEach(serviceId => {
       if (servicesCounter[serviceId] > 1) {
-        debug(`Node ${data.node.Description.Hostname} has more than one service ${serviceId}`)
+        debug(`Node ${node.Description.Hostname} has more than one service ${serviceId}`)
 
         const tasks = node.Tasks.filter(task => task.Service.ID === serviceId)
 
