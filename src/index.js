@@ -42,6 +42,16 @@ const buildNodeTasksTable = (nodes) => {
   return table
 }
 
+/**
+ * Return an array of nodes' id that aren't running the given task
+ */
+const nodesNotRunningService = (nodes, serviceId) => {
+  let nodesAvailable = nodes.filter(node => {
+    return node.Tasks.filter(task => task.Service.ID === serviceId).length === 0
+  })
+  return nodesAvailable.map(node => node.ID)
+}
+
 // Check anti-affinity in each node
 const checkAntiAffinity = (nodes) => {
   nodes.forEach(node => {
@@ -62,9 +72,19 @@ const checkAntiAffinity = (nodes) => {
       if (servicesCounter[serviceId] > 1) {
         debug(`Node ${node.Description.Hostname} has more than one service ${serviceId}`)
 
+        // Get the node's tasks that match the serviceId
         const tasks = node.Tasks.filter(task => task.Service.ID === serviceId)
 
-        debug(`Must kill one of: ${tasks.join(', ')}`)
+        // Check if there's another node that can receive the task
+        const nodesAvailable = nodesNotRunningService(nodes, serviceId)
+
+        // If there's another node that can receive the task we can kill in this node
+        if (nodesAvailable.length > 0) {
+          debug(`Must kill one of: ${tasks.map(task => task.ID).join(', ')}...`)
+        } else {
+          debug(`There is no other available nodes to receive this service...`)
+        }
+
       }
     })
   })
